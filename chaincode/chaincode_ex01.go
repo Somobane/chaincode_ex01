@@ -69,9 +69,9 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string
 	return nil, nil
 }
 
-// Transaction makes payment of X units from A to B but 5 times the value
-func (t *SimpleChaincode) invoke5(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	fmt.Printf("Running invoke5")
+// Transaction makes payment of X units from A to B but 2 times the value
+func (t *SimpleChaincode) invoke2(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	fmt.Printf("Running invoke2")
 	
 	var A, B string    // Entities
 	var Aval, Bval int // Asset holdings
@@ -107,8 +107,8 @@ func (t *SimpleChaincode) invoke5(stub shim.ChaincodeStubInterface, args []strin
 
 	// Perform the execution
 	X, err = strconv.Atoi(args[2])
-	Aval = Aval - X - X - X - X - X
-	Bval = Bval + X + X + X + X + X
+	Aval = Aval - X - X 
+	Bval = Bval + X + X 
 	fmt.Printf("Aval = %d, Bval = %d\n", Aval, Bval)
 
 	// Write the state back to the ledger
@@ -213,9 +213,9 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 	} else if function == "init" {
 		fmt.Printf("Function is init")
 		return t.Init(stub, function, args)
-	} else if function == "invoke5" {
-		fmt.Printf("Function is invoke5")
-		return t.invoke5(stub, args)
+	} else if function == "invoke2" {
+		fmt.Printf("Function is invoke2")
+		return t.invoke2(stub, args)
 	} else if function == "delete" {
 		// Deletes an entity from its state
 		fmt.Printf("Function is delete")
@@ -233,9 +233,9 @@ func (t* SimpleChaincode) Run(stub shim.ChaincodeStubInterface, function string,
 		// Transaction makes payment of X units from A to B
 		fmt.Printf("Function is invoke")
 		return t.invoke(stub, args)
-	} else if function == "invoke5" {
-		fmt.Printf("Function is invoke5")
-		return t.invoke5(stub, args)
+	} else if function == "invoke2" {
+		fmt.Printf("Function is invoke2")
+		return t.invoke2(stub, args)
 	} else if function == "init" {
 		fmt.Printf("Function is init")
 		return t.Init(stub, function, args)
