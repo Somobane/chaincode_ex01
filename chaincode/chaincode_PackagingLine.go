@@ -22,15 +22,15 @@ package main
 import (
 	"errors"
 	"fmt"
-	"strconv"
+	
 	"time"
-	"math/rand"
+	
 	"encoding/json"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	
 )
 
-
+/*"math/rand"*/ //will see if it can be used later
 // SimpleChaincode example simple Chaincode implementation
 type SimpleChaincode struct {
 }
@@ -45,7 +45,7 @@ type SimpleChaincode struct {
 	// PackagingLineState: Overall status of the Packaging Line
 	// PakagingDate: Date when package was packed
 type ShippingCase struct{	
-	CaseId int `json:"caseId"`
+	CaseId string `json:"caseId"`
 	PrimaryDeviceId string `json:"primaryDeviceId"`
 	PrimaryDeviceType string `json:"primaryDeviceType"`
 	SecondaryDeviceId string `json:"secondaryDeviceId"`
@@ -67,8 +67,8 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string
 	fmt.Printf("Init called, initializing chaincode")
 	
 	// Create application Table
-	err1 = stub.CreateTable("ShippingCase", []*shim.ColumnDefinition{
-		&shim.ColumnDefinition{Name: "caseId", Type: shim.ColumnDefinition_INT, Key: true},
+	err := stub.CreateTable("ShippingCase", []*shim.ColumnDefinition{
+		&shim.ColumnDefinition{Name: "caseId", Type: shim.ColumnDefinition_STRING, Key: true},
 		&shim.ColumnDefinition{Name: "primaryDeviceId", Type: shim.ColumnDefinition_STRING, Key: false},
 		&shim.ColumnDefinition{Name: "primaryDeviceType", Type: shim.ColumnDefinition_STRING, Key: false},
 		&shim.ColumnDefinition{Name: "secondaryDeviceId", Type: shim.ColumnDefinition_STRING, Key: false},
@@ -79,7 +79,7 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string
 		&shim.ColumnDefinition{Name: "packagingLineState", Type: shim.ColumnDefinition_STRING, Key: false},
 
 	})
-	if err1 != nil {
+	if err != nil {
 		return nil, errors.New("Failed creating ShippingCase.")
 	}
 
@@ -94,26 +94,26 @@ if len(args) != 4 {
 			return nil, fmt.Errorf("Incorrect number of arguments. Expecting 9. Got: %d.", len(args))
 		}
 		
-		var r int;
-		r := rand.New(rand.NewSource(99));
+		//var r int;
+		//r := rand.New(rand.NewSource(99));
 
-		var t string;
-		t := time.Now().Day() + "-" + time.Now().Month() + "-" + time.Now().Year();
+		//var time_ string;
+		time_ := time.Now();//time.Now().Day() + "-" + time.Now().Month() + "-" + time.Now().Year();
 
-		caseId := r.Int31()
+		caseId := "CS" + "-" + args[0]//r.Int31()
 		primaryDeviceId:=args[0]
 		primaryDeviceType :=args[1]
 		secondaryDeviceId :=args[2]
 		secondaryDeviceType:=args[3]
-		packagingDate:= t
+		packagingDate:= time_.Format(time.RFC3339)
 		testResult:= "Within Range"
-		testDate:= t;
+		testDate:= time_.Format(time.RFC3339);
 		packagingLineState:= "QA"
 	
 		// Insert a row
 		ok, err := stub.InsertRow("ShippingCase", shim.Row{
 			Columns: []*shim.Column{
-				&shim.Column{Value: &shim.Column_Int_{Int_: caseId}},
+				&shim.Column{Value: &shim.Column_String_{String_: caseId}},
 				&shim.Column{Value: &shim.Column_String_{String_: primaryDeviceId}},
 				&shim.Column{Value: &shim.Column_String_{String_: primaryDeviceType}},
 				&shim.Column{Value: &shim.Column_String_{String_: secondaryDeviceId}},
@@ -175,11 +175,10 @@ func (t *SimpleChaincode) getCaseID(stub shim.ChaincodeStubInterface, args []str
 	}
 
 	caseId := args[0]
-	
 
 	// Get the row pertaining to this caseId
 	var columns []shim.Column
-	col1 := shim.Column{Value: &shim.Column_Int_{Int_: caseId}}
+	col1 := shim.Column{Value: &shim.Column_String_{String_: caseId}}
 	columns = append(columns, col1)
 
 	row, err := stub.GetRow("ShippingCase", columns)
